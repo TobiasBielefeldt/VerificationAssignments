@@ -3,14 +3,43 @@
 <nta>
 	<declaration>// Place global declarations here.</declaration>
 	<template>
-		<name x="5" y="5">Template</name>
+		<name x="5" y="5">Clutch</name>
 		<declaration>// Place local declarations here.</declaration>
 		<location id="id0" x="0" y="0">
 		</location>
 		<init ref="id0"/>
 	</template>
+	<template>
+		<name x="5" y="5">Interfece</name>
+		<declaration>// Place local declarations here.</declaration>
+		<location id="id1" x="0" y="0">
+		</location>
+		<init ref="id1"/>
+	</template>
+	<template>
+		<name x="5" y="5">GearBox</name>
+		<declaration>// Place local declarations here.</declaration>
+		<location id="id2" x="0" y="0">
+		</location>
+		<init ref="id2"/>
+	</template>
+	<template>
+		<name x="5" y="5">Engine</name>
+		<declaration>// Place local declarations here.</declaration>
+		<location id="id3" x="0" y="0">
+		</location>
+		<init ref="id3"/>
+	</template>
+	<template>
+		<name x="5" y="5">GearControl</name>
+		<declaration>// Place local declarations here.</declaration>
+		<location id="id4" x="0" y="0">
+		</location>
+		<init ref="id4"/>
+	</template>
 	<system>// Place template instantiations here.
 Process = Template();
+p = test();
 // List one or more processes to be composed into a system.
 system Process;
     </system>
