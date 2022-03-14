@@ -1,41 +1,106 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_2.dtd'>
 <nta>
-	<declaration>// Place global declarations here.</declaration>
+	<declaration>// Place global declarations here.
+int GCTimer = 0;
+int ETimer = 0;
+int GBTimer = 0;
+int FromGear = 0;
+int ToGear = 0;
+
+int SysTimer = 0;
+int ErrStat = 0;
+int UseCase = 0;
+</declaration>
 	<template>
 		<name x="5" y="5">Clutch</name>
 		<declaration>// Place local declarations here.</declaration>
-		<location id="id0" x="0" y="0">
+		<location id="id0" x="-153" y="8">
+			<name x="-178" y="17">Closed</name>
+		</location>
+		<location id="id1" x="144" y="-144">
+			<name x="119" y="-178">Open</name>
+		</location>
+		<location id="id2" x="144" y="8">
+			<name x="127" y="17">Closing</name>
+			<label kind="invariant" x="110" y="34">CTimer &lt;= 150</label>
+		</location>
+		<location id="id3" x="-153" y="-144">
+			<name x="-178" y="-178">Opening</name>
+			<label kind="invariant" x="-195" y="-195">CTimer &lt;= 150</label>
+		</location>
+		<location id="id4" x="-59" y="-68">
+			<name x="-93" y="-59">ErrorOpen</name>
+		</location>
+		<location id="id5" x="42" y="-68">
+			<name x="8" y="-102">ErrorClose</name>
 		</location>
 		<init ref="id0"/>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id5"/>
+			<label kind="guard" x="42" y="-51">CTimer == 150
+ErrStat := 1</label>
+		</transition>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id4"/>
+			<label kind="guard" x="-144" y="-127">CTimer == 150
+ErrStat := 2</label>
+		</transition>
+		<transition>
+			<source ref="id0"/>
+			<target ref="id3"/>
+			<label kind="guard" x="-238" y="-85">OpenClutch?
+CTimer := 0</label>
+			<nail x="-153" y="-17"/>
+		</transition>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id0"/>
+			<label kind="guard" x="-68" y="8">CTimer &gt;= 100
+ClutchIsClosed!</label>
+		</transition>
+		<transition>
+			<source ref="id1"/>
+			<target ref="id2"/>
+			<label kind="guard" x="144" y="-93">CloseClutch?
+CTimer := 0</label>
+		</transition>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id1"/>
+			<label kind="guard" x="-59" y="-187">CTimer &gt;= 100
+ClutchIsOpen!</label>
+		</transition>
 	</template>
 	<template>
 		<name x="5" y="5">Interfece</name>
 		<declaration>// Place local declarations here.</declaration>
-		<location id="id1" x="0" y="0">
+		<location id="id6" x="0" y="0">
 		</location>
-		<init ref="id1"/>
+		<init ref="id6"/>
 	</template>
 	<template>
 		<name x="5" y="5">GearBox</name>
 		<declaration>// Place local declarations here.</declaration>
-		<location id="id2" x="0" y="0">
+		<location id="id7" x="0" y="0">
 		</location>
-		<init ref="id2"/>
+		<init ref="id7"/>
 	</template>
 	<template>
 		<name x="5" y="5">Engine</name>
 		<declaration>// Place local declarations here.</declaration>
-		<location id="id3" x="0" y="0">
+		<location id="id8" x="0" y="0">
 		</location>
-		<init ref="id3"/>
+		<init ref="id8"/>
 	</template>
 	<template>
 		<name x="5" y="5">GearControl</name>
 		<declaration>// Place local declarations here.</declaration>
-		<location id="id4" x="0" y="0">
+		<location id="id9" x="0" y="0">
 		</location>
-		<init ref="id4"/>
+		<init ref="id9"/>
 	</template>
 	<system>// Place template instantiations here.
 Process = Template();
