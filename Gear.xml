@@ -18,7 +18,8 @@
 	</template>
 	<template>
 		<name x="5" y="5">GearBox</name>
-		<declaration>// Place local declarations here.</declaration>
+		<declaration>// Place local declarations here.
+// TODO: GEARBOX</declaration>
 		<location id="id2" x="0" y="0">
 		</location>
 		<init ref="id2"/>
