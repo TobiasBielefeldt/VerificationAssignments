@@ -31,7 +31,7 @@
 			<label kind="invariant" x="-391" y="51">ETimer&lt;=200</label>
 		</location>
 		<location id="id4" x="-339" y="-161">
-			<name x="-416" y="-153">c:(ClutchOpen)</name>
+			<name x="-416" y="-153">ClutchOpen</name>
 		</location>
 		<location id="id5" x="-535" y="17">
 			<name x="-637" y="0">Speed</name>
@@ -55,6 +55,7 @@
 			<name x="-214" y="-17">Zero</name>
 		</location>
 		<location id="id11" x="-255" y="-118">
+			<name x="-265" y="-152">Initial</name>
 		</location>
 		<init ref="id11"/>
 		<transition>
