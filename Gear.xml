@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_2.dtd'>
 <nta>
-	<declaration>// Place global declarations here.</declaration>
+	<declaration>// Place global declarations here.
+
+int GBTimer:=0;
+int ErrStat:= 0;
+
+chan ReqSet, GearSet, GearNeu, ReqNeu;</declaration>
 	<template>
 		<name x="5" y="5">Clutch</name>
 		<declaration>// Place local declarations here.</declaration>
@@ -20,30 +25,78 @@
 		<name x="5" y="5">GearBox</name>
 		<declaration>// Place local declarations here.
 // TODO: GEARBOX</declaration>
-		<location id="id2" x="0" y="0">
+		<location id="id2" x="-212" y="-102">
+			<name x="-246" y="-136">Neutral</name>
+		</location>
+		<location id="id3" x="-212" y="59">
+			<name x="-195" y="68">Closing</name>
+		</location>
+		<location id="id4" x="85" y="59">
+			<name x="93" y="34">Idle</name>
+		</location>
+		<location id="id5" x="85" y="-102">
+			<name x="75" y="-136">Opening</name>
+		</location>
+		<location id="id6" x="-127" y="-17">
+			<name x="-137" y="-51">ErrorIdle</name>
+		</location>
+		<location id="id7" x="-25" y="-42">
+			<name x="-25" y="-34">ErrorNeu</name>
 		</location>
 		<init ref="id2"/>
+		<transition>
+			<source ref="id5"/>
+			<target ref="id7"/>
+			<label kind="guard" x="-68" y="-93">GBTimer&gt;200</label>
+			<label kind="assignment" x="-51" y="-76">ErrStat:=4</label>
+		</transition>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id6"/>
+			<label kind="guard" x="-144" y="0">GBTimer == 300</label>
+			<label kind="assignment" x="-127" y="17">ErrStat:=3</label>
+		</transition>
+		<transition>
+			<source ref="id5"/>
+			<target ref="id2"/>
+			<label kind="guard" x="-127" y="-153">GBTimer&gt;=100</label>
+			<label kind="synchronisation" x="-119" y="-127">GearNeu!</label>
+		</transition>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id5"/>
+			<label kind="synchronisation" x="93" y="-42">ReqNeu?</label>
+			<label kind="assignment" x="93" y="-25">GBTimer:=0</label>
+		</transition>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id4"/>
+			<label kind="guard" x="-119" y="59">GBTimer&gt;=100</label>
+			<label kind="synchronisation" x="-119" y="76">GearSet!</label>
+		</transition>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id3"/>
+			<label kind="synchronisation" x="-280" y="-42">ReqSet?</label>
+			<label kind="assignment" x="-306" y="-25">GBTimer:=0</label>
+		</transition>
 	</template>
 	<template>
 		<name x="5" y="5">Engine</name>
 		<declaration>// Place local declarations here.</declaration>
-		<location id="id3" x="0" y="0">
+		<location id="id8" x="-136" y="-110">
 		</location>
-		<init ref="id3"/>
+		<init ref="id8"/>
 	</template>
 	<template>
 		<name x="5" y="5">GearControl</name>
 		<declaration>// Place local declarations here.</declaration>
-		<location id="id4" x="0" y="0">
+		<location id="id9" x="0" y="0">
 		</location>
-		<init ref="id4"/>
+		<init ref="id9"/>
 	</template>
-	<system>// Place template instantiations here.
-Process = Template();
-p = test();
-// List one or more processes to be composed into a system.
-system Process;
-    </system>
+	<system>
+system GearBox;</system>
 	<queries>
 		<query>
 			<formula></formula>
