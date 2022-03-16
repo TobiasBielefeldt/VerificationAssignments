@@ -26,16 +26,129 @@
 	<template>
 		<name x="5" y="5">Engine</name>
 		<declaration>// Place local declarations here.</declaration>
-		<location id="id3" x="0" y="0">
+		<location id="id3" x="-339" y="18">
+			<name x="-391" y="34">FindSpeed</name>
+			<label kind="invariant" x="-391" y="51">ETimer&lt;=200</label>
 		</location>
-		<init ref="id3"/>
+		<location id="id4" x="-339" y="-161">
+			<name x="-416" y="-153">c:(ClutchOpen)</name>
+		</location>
+		<location id="id5" x="-535" y="17">
+			<name x="-637" y="0">Speed</name>
+			<label kind="invariant" x="-637" y="17">ETimer&lt;=500</label>
+		</location>
+		<location id="id6" x="-458" y="-161">
+			<name x="-501" y="-144">ClutchClose</name>
+			<label kind="invariant" x="-501" y="-127">ETimer&lt;=900</label>
+		</location>
+		<location id="id7" x="-458" y="68">
+			<name x="-493" y="85">ErrorSpeed</name>
+		</location>
+		<location id="id8" x="-535" y="-246">
+			<name x="-603" y="-263">Torque</name>
+		</location>
+		<location id="id9" x="-204" y="-246">
+			<name x="-187" y="-272">DecTorque</name>
+			<label kind="invariant" x="-187" y="-255">ETimer&lt;=400</label>
+		</location>
+		<location id="id10" x="-204" y="17">
+			<name x="-214" y="-17">Zero</name>
+		</location>
+		<location id="id11" x="-255" y="-118">
+		</location>
+		<init ref="id11"/>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id4"/>
+			<label kind="guard" x="-399" y="-102">ETimer==200</label>
+			<label kind="assignment" x="-399" y="-85">UseCase:=2</label>
+		</transition>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id5"/>
+			<label kind="guard" x="-450" y="-25">ETimer&gt;=50</label>
+			<label kind="synchronisation" x="-450" y="-8">SpeedSet!</label>
+			<label kind="assignment" x="-450" y="8">ETimer:=0</label>
+		</transition>
+		<transition>
+			<source ref="id6"/>
+			<target ref="id7"/>
+			<label kind="guard" x="-493" y="-68">ETimer==900</label>
+		</transition>
+		<transition>
+			<source ref="id5"/>
+			<target ref="id7"/>
+			<label kind="guard" x="-578" y="51">ETimer==500</label>
+		</transition>
+		<transition>
+			<source ref="id5"/>
+			<target ref="id8"/>
+			<label kind="guard" x="-629" y="-136">ETimer&lt;500</label>
+			<label kind="synchronisation" x="-629" y="-119">ReqTorque?</label>
+		</transition>
+		<transition>
+			<source ref="id6"/>
+			<target ref="id8"/>
+			<label kind="guard" x="-510" y="-238">ETimer&gt;=50</label>
+			<label kind="synchronisation" x="-510" y="-221">ReqTorque?</label>
+		</transition>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id6"/>
+			<label kind="guard" x="-425" y="-204">ToGear&gt;0</label>
+			<label kind="assignment" x="-425" y="-187">ETimer:=0</label>
+		</transition>
+		<transition>
+			<source ref="id8"/>
+			<target ref="id9"/>
+			<label kind="synchronisation" x="-459" y="-306">ReqZeroTorque?</label>
+			<label kind="assignment" x="-459" y="-289">ETimer:=0
+UseCase:=0</label>
+		</transition>
+		<transition>
+			<source ref="id9"/>
+			<target ref="id4"/>
+			<label kind="guard" x="-323" y="-221">ETimer==400</label>
+			<label kind="assignment" x="-323" y="-204">UseCase:=1</label>
+			<nail x="-339" y="-221"/>
+		</transition>
+		<transition>
+			<source ref="id10"/>
+			<target ref="id11"/>
+			<label kind="guard" x="-229" y="-84">ToGear==0</label>
+		</transition>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id11"/>
+			<label kind="guard" x="-321" y="-173">ToGear==0</label>
+		</transition>
+		<transition>
+			<source ref="id9"/>
+			<target ref="id10"/>
+			<label kind="guard" x="-195" y="-153">ETimer&gt;=150</label>
+			<label kind="synchronisation" x="-195" y="-136">TorqueZero!</label>
+		</transition>
+		<transition>
+			<source ref="id10"/>
+			<target ref="id3"/>
+			<label kind="guard" x="-280" y="25">ToGear&gt;0</label>
+			<label kind="synchronisation" x="-280" y="42">ReqSpeed?</label>
+			<label kind="assignment" x="-280" y="59">ETimer:=0</label>
+		</transition>
+		<transition>
+			<source ref="id11"/>
+			<target ref="id3"/>
+			<label kind="synchronisation" x="-321" y="-67">ReqSpeed?</label>
+			<label kind="assignment" x="-321" y="-50">ETimer:=0
+UseCase:=0</label>
+		</transition>
 	</template>
 	<template>
 		<name x="5" y="5">GearControl</name>
 		<declaration>// Place local declarations here.</declaration>
-		<location id="id4" x="0" y="0">
+		<location id="id12" x="0" y="0">
 		</location>
-		<init ref="id4"/>
+		<init ref="id12"/>
 	</template>
 	<system>// Place template instantiations here.
 Process = Template();
