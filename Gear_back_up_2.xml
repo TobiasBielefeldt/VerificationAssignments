@@ -989,17 +989,5 @@ system Clutch, Interface, GearBox, Engine, GearControl;
 			<formula>E&lt;&gt; Interface.Gear4</formula>
 			<comment>Custom 05</comment>
 		</query>
-		<query>
-			<formula>A&lt;&gt; Interface.Gear3 imply Interface.Gear2</formula>
-			<comment></comment>
-		</query>
-		<query>
-			<formula>A&lt;&gt; Interface.Gear2 imply Interface.Gear3</formula>
-			<comment></comment>
-		</query>
-		<query>
-			<formula>A[] Interface.Gear3 imply (Interface.Gear2 or Interface.chkGear23)</formula>
-			<comment></comment>
-		</query>
 	</queries>
 </nta>
