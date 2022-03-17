@@ -965,5 +965,41 @@ system Clutch, Interface, GearBox, Engine, GearControl;
 			<formula>A[](1&gt;0)</formula>
 			<comment>P17</comment>
 		</query>
+		<query>
+			<formula>A[] deadlock imply (ErrStat &gt; 0)</formula>
+			<comment>Custom 01</comment>
+		</query>
+		<query>
+			<formula>E&lt;&gt; Interface.Gear1 imply Interface.GearR</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>E&lt;&gt; Interface.Gear1</formula>
+			<comment>Custom 02</comment>
+		</query>
+		<query>
+			<formula>E&lt;&gt; Interface.Gear2</formula>
+			<comment>Custom 03</comment>
+		</query>
+		<query>
+			<formula>E&lt;&gt; Interface.Gear3</formula>
+			<comment>Custom 04</comment>
+		</query>
+		<query>
+			<formula>E&lt;&gt; Interface.Gear4</formula>
+			<comment>Custom 05</comment>
+		</query>
+		<query>
+			<formula>A&lt;&gt; Interface.Gear3 imply Interface.Gear2</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>A&lt;&gt; Interface.Gear2 imply Interface.Gear3</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>A[] Interface.Gear3 imply (Interface.Gear2 or Interface.chkGear23)</formula>
+			<comment></comment>
+		</query>
 	</queries>
 </nta>
