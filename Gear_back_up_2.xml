@@ -794,7 +794,7 @@ system Clutch, Interface, GearBox, Engine, GearControl;
 			<comment>P3</comment>
 		</query>
 		<query>
-			<formula>A[](GearBox.Neutral and (Interface.Gear1 or Interface.Gear2 or Interface.Gear3 or Interface.Gear4 or Interface.Gear5 or Interface.GearR))</formula>
+			<formula>A[] not(GearBox.Neutral and (Interface.Gear1 or Interface.Gear2 or Interface.Gear3 or Interface.Gear4 or Interface.Gear5 or Interface.GearR))</formula>
 			<comment>P4</comment>
 		</query>
 		<query>
