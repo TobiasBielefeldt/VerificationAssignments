@@ -367,6 +367,7 @@ ToGear:=6</label>
 		</location>
 		<location id="id35" x="-51" y="-153">
 			<name x="-93" y="-187">ClutchOpen</name>
+			<committed/>
 		</location>
 		<location id="id36" x="-178" y="-178">
 			<name x="-195" y="-229">ClutchClosed</name>
