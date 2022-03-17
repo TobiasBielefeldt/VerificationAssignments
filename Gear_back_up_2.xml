@@ -2,20 +2,12 @@
 <!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_2.dtd'>
 <nta>
 	<declaration>// Place global declarations here.
-int FromGear;
-int ToGear;
-chan NewGear;
-chan ReqNewGear;
-int CTimer;
-int ErrStat;
+int FromGear, ToGear, ErrStat, UseCase;
+clock SysTimer, CTimer, GBTimer, ETimer, GCTimer;
+chan NewGear, ReqNewGear;
 chan OpenClutch, ClutchIsOpen, ClutchIsClosed, CloseClutch;
 chan ReqSet, GearNeu, ReqNeu, GearSet;
-int GBTimer;
-int ETimer;
-int UseCase;
-chan ReqZeroTorque, ReqZero, TorqueZero, ReqSpeed, SpeedSet, ReqTorque;
-int GCTimer;
-int SysTimer;</declaration>
+chan ReqZeroTorque, ReqZero, TorqueZero, ReqSpeed, SpeedSet, ReqTorque;</declaration>
 	<template>
 		<name x="5" y="5">Clutch</name>
 		<declaration>// Place local declarations here.
