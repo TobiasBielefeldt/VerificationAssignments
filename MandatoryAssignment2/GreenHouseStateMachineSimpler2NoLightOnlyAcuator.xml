@@ -2,20 +2,20 @@
 <!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_2.dtd'>
 <nta>
 	<declaration>// Place global declarations here.
-const int N = 1;//#SimpleWorkers can't be 0 :(
-
-typedef int[0,N-1] id_sw;
-typedef int[0,N] id_t;
-
 int moisture;
+
+clock PumpBLP;
+
+
+bool PumpBLPB;
 
 bool isPumpOn =  false;
 
 int dayState = 0;
 
-urgent chan UpdateWorker[N+1], SendDataToGateway[N+1], TurnOnPump,TurnOffPump;
+urgent chan UpdateWorker, SendDataToGateway, TurnOnPump,TurnOffPump, Go1,Go2;
 
-chan UserInput[N+1],NotifyUser;
+chan UserInput,NotifyUser;
 </declaration>
 	<template>
 		<name x="5" y="5">Gateway</name>
@@ -23,15 +23,6 @@ chan UserInput[N+1],NotifyUser;
 clock sendDelay;
 
 int failCounter;
-id_t updateVal;
-
-void storeVal(id_t element)
-{
-    updateVal =  element;
-    
-}
-
-
 
 bool errorLED;</declaration>
 		<location id="id0" x="25" y="-93">
@@ -109,54 +100,116 @@ bool errorLED;</declaration>
 		<transition>
 			<source ref="id1"/>
 			<target ref="id3"/>
-			<label kind="synchronisation" x="-272" y="-59">UpdateWorker[updateVal]!</label>
+			<label kind="synchronisation" x="-272" y="-59">UpdateWorker!</label>
 		</transition>
 		<transition>
 			<source ref="id0"/>
 			<target ref="id2"/>
-			<label kind="select" x="43" y="-144">id : id_t</label>
-			<label kind="synchronisation" x="42" y="-119">SendDataToGateway[id]?</label>
+			<label kind="synchronisation" x="42" y="-119">SendDataToGateway?</label>
 			<label kind="assignment" x="43" y="-93">sendDelay = 0,
 failCounter = 0</label>
 		</transition>
 		<transition>
 			<source ref="id0"/>
 			<target ref="id1"/>
-			<label kind="select" x="-75" y="-144">id : id_t</label>
-			<label kind="synchronisation" x="-76" y="-127">UserInput[id]?</label>
-			<label kind="assignment" x="-75" y="-93">storeVal(id)</label>
+			<label kind="synchronisation" x="-76" y="-127">UserInput?</label>
+		</transition>
+	</template>
+	<template>
+		<name>PumpBL</name>
+		<location id="id8" x="-8" y="0">
+			<name x="-59" y="8">MoistureIsGood</name>
+		</location>
+		<location id="id9" x="-8" y="-119">
+			<name x="-18" y="-153">MoistureIsLow</name>
+		</location>
+		<location id="id10" x="-187" y="68">
+			<name x="-263" y="76">MoistureIsToHigh</name>
+		</location>
+		<init ref="id8"/>
+		<transition>
+			<source ref="id10"/>
+			<target ref="id8"/>
+			<label kind="guard" x="-93" y="85">moisture &lt;= 15</label>
+			<label kind="synchronisation" x="-85" y="68">Go4?</label>
+			<nail x="-85" y="76"/>
+		</transition>
+		<transition>
+			<source ref="id8"/>
+			<target ref="id10"/>
+			<label kind="guard" x="-187" y="-17">moisture &gt; 15</label>
+			<label kind="synchronisation" x="-161" y="0">Go3?</label>
+			<label kind="assignment" x="-195" y="17">PumoBLP2 = 0</label>
+			<nail x="-119" y="8"/>
+		</transition>
+		<transition>
+			<source ref="id9"/>
+			<target ref="id8"/>
+			<label kind="guard" x="17" y="-102">moisture &gt;= 10</label>
+			<label kind="synchronisation" x="34" y="-59">Go2?</label>
+			<nail x="29" y="-55"/>
+		</transition>
+		<transition>
+			<source ref="id8"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-136" y="-68">moisture &lt; 10</label>
+			<label kind="synchronisation" x="-110" y="-93">Go1?</label>
+			<label kind="assignment" x="-136" y="-51">PumpBLP = 0</label>
+			<nail x="-51" y="-51"/>
+		</transition>
+	</template>
+	<template>
+		<name>Go</name>
+		<location id="id11" x="0" y="0">
+		</location>
+		<location id="id12" x="-17" y="-119">
+		</location>
+		<init ref="id11"/>
+		<transition>
+			<source ref="id12"/>
+			<target ref="id11"/>
+			<label kind="synchronisation" x="4" y="-114">Go2!,
+Go3!</label>
+			<nail x="25" y="-76"/>
+		</transition>
+		<transition>
+			<source ref="id11"/>
+			<target ref="id12"/>
+			<label kind="synchronisation" x="-25" y="-51">Go1!,
+Go31</label>
+			<nail x="-51" y="-68"/>
 		</transition>
 	</template>
 	<template>
 		<name>UserInputSimulation</name>
 		<declaration>clock delay;</declaration>
-		<location id="id8" x="0" y="0">
+		<location id="id13" x="0" y="0">
 			<name x="-10" y="-34">Idle</name>
-			<label kind="invariant" x="-42" y="8">delay &lt;= 500</label>
+			<label kind="invariant" x="-42" y="8">delay &lt;= 5000</label>
 		</location>
-		<location id="id9" x="136" y="0">
+		<location id="id14" x="136" y="0">
 			<name x="126" y="-34">UpdateVariable</name>
 		</location>
-		<init ref="id8"/>
+		<init ref="id13"/>
 		<transition>
-			<source ref="id9"/>
-			<target ref="id8"/>
+			<source ref="id14"/>
+			<target ref="id13"/>
 			<label kind="synchronisation" x="34" y="25">NotifyUser?</label>
 			<label kind="assignment" x="42" y="42">delay = 0</label>
 			<nail x="68" y="34"/>
 		</transition>
 		<transition>
-			<source ref="id8"/>
-			<target ref="id9"/>
-			<label kind="select" x="42" y="-103">id : id_t</label>
+			<source ref="id13"/>
+			<target ref="id14"/>
 			<label kind="guard" x="25" y="-85">delay &gt;= 500</label>
-			<label kind="synchronisation" x="25" y="-68">UserInput[id]!</label>
+			<label kind="synchronisation" x="25" y="-68">UserInput!</label>
 			<nail x="68" y="-42"/>
 		</transition>
 	</template>
 	<template>
 		<name>ActuatorWorker</name>
-		<declaration>clock workerClock;
+		<declaration>clock pumpDelay;
+clock workerClock;
 clock sendDelay;
 clock updateClock;
 
@@ -164,62 +217,62 @@ int failCounter;
 
 bool errorLED;
 </declaration>
-		<location id="id10" x="-493" y="-102">
+		<location id="id15" x="-493" y="-102">
 			<name x="-503" y="-136">Idle</name>
 			<label kind="invariant" x="-561" y="-153">workerClock &lt;= 300</label>
 			<label kind="testcodeEnter">moisture--</label>
 		</location>
-		<location id="id11" x="-110" y="-102">
+		<location id="id16" x="-110" y="-102">
 			<name x="-212" y="-178">SampleSensors</name>
 			<urgent/>
 		</location>
-		<location id="id12" x="-110" y="263">
+		<location id="id17" x="-110" y="263">
 			<name x="-102" y="212">TryToSendData</name>
 			<label kind="invariant" x="-102" y="229">sendDelay &lt;= 5</label>
 		</location>
-		<location id="id13" x="-578" y="255">
+		<location id="id18" x="-578" y="255">
 			<name x="-748" y="238">FailedCheckForUpdate</name>
 			<label kind="invariant" x="-748" y="255">sendDelay &lt;= 10</label>
 		</location>
-		<location id="id14" x="-756" y="-102">
+		<location id="id19" x="-756" y="-102">
 			<name x="-748" y="-153">Update</name>
 			<label kind="invariant" x="-748" y="-136">updateClock &lt;= 5</label>
 		</location>
-		<location id="id15" x="535" y="-93">
+		<location id="id20" x="535" y="-93">
 			<committed/>
 		</location>
-		<location id="id16" x="-578" y="400">
+		<location id="id21" x="-578" y="400">
 			<name x="-689" y="400">AltUpdate</name>
 			<label kind="invariant" x="-689" y="417">updateClock &lt;= 5</label>
 		</location>
-		<location id="id17" x="-331" y="348">
+		<location id="id22" x="-331" y="348">
 			<name x="-365" y="356">NoUpdate</name>
 			<committed/>
 		</location>
-		<location id="id18" x="-110" y="67">
+		<location id="id23" x="-110" y="67">
 			<name x="-93" y="51">FailedToSendDrop</name>
 			<committed/>
 		</location>
-		<location id="id19" x="68" y="-51">
+		<location id="id24" x="68" y="-51">
 			<name x="-8" y="-34">LowSoilMoistureDetected</name>
 			<committed/>
 		</location>
-		<location id="id20" x="68" y="-153">
+		<location id="id25" x="68" y="-153">
 			<name x="-8" y="-187">GoodSoilMoistureDetected</name>
 			<committed/>
 		</location>
-		<location id="id21" x="-493" y="59">
+		<location id="id26" x="-493" y="59">
 			<name x="-561" y="51">Worked</name>
 			<committed/>
 		</location>
-		<location id="id22" x="162" y="-246">
+		<location id="id27" x="162" y="-246">
 			<name x="119" y="-280">WaitCheckOnPump</name>
-			<label kind="invariant" x="119" y="-238">workerClock &lt;= 5</label>
+			<label kind="invariant" x="119" y="-238">pumpDelay &lt;= 5</label>
 		</location>
-		<init ref="id10"/>
+		<init ref="id15"/>
 		<transition>
-			<source ref="id15"/>
-			<target ref="id10"/>
+			<source ref="id20"/>
+			<target ref="id15"/>
 			<label kind="guard" x="-221" y="-314">!isPumpOn and workerClock &lt; 300</label>
 			<nail x="595" y="-144"/>
 			<nail x="595" y="-289"/>
@@ -228,45 +281,45 @@ bool errorLED;
 			<nail x="-569" y="-17"/>
 		</transition>
 		<transition>
-			<source ref="id22"/>
-			<target ref="id11"/>
-			<label kind="guard" x="-93" y="-272">workerClock &gt;= 5</label>
+			<source ref="id27"/>
+			<target ref="id16"/>
+			<label kind="guard" x="-93" y="-272">pumpDelay &gt;= 5</label>
 			<nail x="-110" y="-246"/>
 		</transition>
 		<transition>
-			<source ref="id18"/>
-			<target ref="id11"/>
+			<source ref="id23"/>
+			<target ref="id16"/>
 			<label kind="guard" x="-102" y="0">isPumpOn</label>
 		</transition>
 		<transition>
-			<source ref="id21"/>
-			<target ref="id11"/>
+			<source ref="id26"/>
+			<target ref="id16"/>
 			<label kind="guard" x="-399" y="17">isPumpOn</label>
 			<label kind="assignment" x="-399" y="34">workerClock = 0</label>
 		</transition>
 		<transition>
-			<source ref="id21"/>
-			<target ref="id10"/>
+			<source ref="id26"/>
+			<target ref="id15"/>
 			<label kind="guard" x="-484" y="-42">!isPumpOn</label>
 			<label kind="assignment" x="-484" y="-25">workerClock = 0</label>
 		</transition>
 		<transition>
-			<source ref="id20"/>
-			<target ref="id15"/>
+			<source ref="id25"/>
+			<target ref="id20"/>
+		</transition>
+		<transition>
+			<source ref="id24"/>
+			<target ref="id20"/>
 		</transition>
 		<transition>
 			<source ref="id19"/>
-			<target ref="id15"/>
-		</transition>
-		<transition>
-			<source ref="id14"/>
-			<target ref="id11"/>
+			<target ref="id16"/>
 			<nail x="-756" y="-221"/>
 			<nail x="-349" y="-222"/>
 		</transition>
 		<transition>
-			<source ref="id15"/>
-			<target ref="id12"/>
+			<source ref="id20"/>
+			<target ref="id17"/>
 			<label kind="guard" x="297" y="323">isPumpOn and workerClock &gt;= 300</label>
 			<label kind="assignment" x="365" y="340">sendDelay = 0,
 failCounter = 0</label>
@@ -275,230 +328,103 @@ failCounter = 0</label>
 			<nail x="-42" y="314"/>
 		</transition>
 		<transition>
-			<source ref="id18"/>
-			<target ref="id10"/>
+			<source ref="id23"/>
+			<target ref="id15"/>
 			<label kind="guard" x="-263" y="34">!isPumpOn</label>
 			<label kind="assignment" x="-263" y="51">workerClock = 0</label>
 		</transition>
 		<transition>
-			<source ref="id12"/>
-			<target ref="id18"/>
+			<source ref="id17"/>
+			<target ref="id23"/>
 			<label kind="guard" x="-102" y="110">failCounter &gt;= 3 and
 sendDelay &gt;= 5</label>
-			<label kind="assignment" x="-102" y="94">errorLED = true</label>
-			<nail x="-110" y="237"/>
+			<label kind="assignment" x="-102" y="153">errorLED = true</label>
+			<nail x="-110" y="245"/>
 		</transition>
 		<transition>
-			<source ref="id15"/>
-			<target ref="id22"/>
+			<source ref="id20"/>
+			<target ref="id27"/>
 			<label kind="guard" x="306" y="-272">isPumpOn and workerClock &lt; 300</label>
-			<label kind="assignment" x="374" y="-246">workerClock = 0</label>
+			<label kind="assignment" x="374" y="-246">pumpDelay = 0</label>
 			<nail x="535" y="-246"/>
 		</transition>
 		<transition>
-			<source ref="id17"/>
-			<target ref="id12"/>
+			<source ref="id22"/>
+			<target ref="id17"/>
 			<label kind="assignment" x="-229" y="314">sendDelay = 0</label>
 		</transition>
 		<transition>
-			<source ref="id13"/>
-			<target ref="id17"/>
+			<source ref="id18"/>
+			<target ref="id22"/>
 			<label kind="guard" x="-527" y="314">sendDelay &gt;= 10</label>
 		</transition>
 		<transition>
-			<source ref="id16"/>
-			<target ref="id12"/>
+			<source ref="id21"/>
+			<target ref="id17"/>
 			<label kind="assignment" x="-263" y="416">sendDelay = 0</label>
 			<nail x="-110" y="408"/>
 		</transition>
 		<transition>
-			<source ref="id13"/>
-			<target ref="id16"/>
-			<label kind="synchronisation" x="-697" y="306">UpdateWorker[N]?</label>
+			<source ref="id18"/>
+			<target ref="id21"/>
+			<label kind="synchronisation" x="-697" y="306">UpdateWorker?</label>
 			<label kind="assignment" x="-697" y="332">updateClock = 0</label>
 		</transition>
 		<transition>
-			<source ref="id11"/>
-			<target ref="id19"/>
+			<source ref="id16"/>
+			<target ref="id24"/>
 			<label kind="guard" x="-17" y="-93">moisture &lt; 10</label>
 			<label kind="synchronisation" x="-17" y="-110">TurnOnPump!</label>
 		</transition>
 		<transition>
-			<source ref="id12"/>
-			<target ref="id21"/>
-			<label kind="synchronisation" x="-340" y="102">SendDataToGateway[N]!</label>
+			<source ref="id17"/>
+			<target ref="id26"/>
+			<label kind="synchronisation" x="-340" y="102">SendDataToGateway!</label>
 			<label kind="assignment" x="-340" y="119">errorLED = false</label>
 		</transition>
 		<transition>
-			<source ref="id15"/>
-			<target ref="id12"/>
+			<source ref="id20"/>
+			<target ref="id17"/>
 			<label kind="guard" x="280" y="203">!isPumpOn and workerClock &gt;= 300</label>
 			<label kind="assignment" x="280" y="220">sendDelay = 0,
 failCounter = 0</label>
 			<nail x="535" y="263"/>
 		</transition>
 		<transition>
-			<source ref="id11"/>
-			<target ref="id20"/>
+			<source ref="id16"/>
+			<target ref="id25"/>
 			<label kind="guard" x="-85" y="-154">moisture &gt;= 10</label>
 			<label kind="synchronisation" x="-85" y="-170">TurnOffPump!</label>
 		</transition>
 		<transition>
-			<source ref="id10"/>
-			<target ref="id14"/>
-			<label kind="synchronisation" x="-680" y="-102">UpdateWorker[N]?</label>
+			<source ref="id15"/>
+			<target ref="id19"/>
+			<label kind="synchronisation" x="-680" y="-102">UpdateWorker?</label>
 			<label kind="assignment" x="-680" y="-85">updateClock = 0</label>
 		</transition>
 		<transition>
-			<source ref="id12"/>
-			<target ref="id13"/>
+			<source ref="id17"/>
+			<target ref="id18"/>
 			<label kind="guard" x="-339" y="263">sendDelay &gt;= 5 and 
 failCounter &lt; 3</label>
 			<label kind="assignment" x="-331" y="238">failCounter++</label>
 		</transition>
 		<transition>
-			<source ref="id10"/>
-			<target ref="id11"/>
+			<source ref="id15"/>
+			<target ref="id16"/>
 			<label kind="guard" x="-399" y="-127">workerClock &gt;= 300 or isPumpOn</label>
-		</transition>
-	</template>
-	<template>
-		<name>SensorWorker</name>
-		<parameter>const id_sw id</parameter>
-		<declaration>clock workerClock;
-clock sendDelay;
-clock updateClock;
-
-int failCounter;
-
-bool errorLED;</declaration>
-		<location id="id23" x="-93" y="-59">
-			<name x="-103" y="-93">Idle</name>
-			<label kind="invariant" x="-161" y="-110">workerClock &lt;= 300</label>
-			<label kind="testcodeEnter">moisture--</label>
-		</location>
-		<location id="id24" x="136" y="-59">
-			<name x="76" y="-102">SampleSensors</name>
-			<urgent/>
-		</location>
-		<location id="id25" x="340" y="178">
-			<name x="357" y="144">TryToSendData</name>
-			<label kind="invariant" x="357" y="127">sendDelay &lt;= 5</label>
-		</location>
-		<location id="id26" x="145" y="178">
-			<name x="-25" y="161">FailedCheckForUpdate</name>
-			<label kind="invariant" x="18" y="144">sendDelay &lt;= 10</label>
-		</location>
-		<location id="id27" x="145" y="322">
-			<name x="60" y="313">AltUpdate</name>
-			<label kind="invariant" x="135" y="339">updateClock &lt;= 5</label>
-		</location>
-		<location id="id28" x="238" y="246">
-			<name x="204" y="254">NoUpdate</name>
-			<committed/>
-		</location>
-		<location id="id29" x="289" y="34">
-			<name x="230" y="0">FailedToSendDrop</name>
-			<committed/>
-		</location>
-		<location id="id30" x="-136" y="85">
-			<name x="-146" y="51">Worked</name>
-			<committed/>
-		</location>
-		<location id="id31" x="-314" y="-59">
-			<name x="-339" y="-102">Update</name>
-			<label kind="invariant" x="-365" y="-34">updateClock &lt;= 5</label>
-		</location>
-		<init ref="id23"/>
-		<transition>
-			<source ref="id31"/>
-			<target ref="id24"/>
-			<nail x="-93" y="-170"/>
-		</transition>
-		<transition>
-			<source ref="id23"/>
-			<target ref="id31"/>
-			<label kind="synchronisation" x="-255" y="-76">UpdateWorker[id]?</label>
-			<label kind="assignment" x="-255" y="-59">updateClock = 0</label>
-		</transition>
-		<transition>
-			<source ref="id30"/>
-			<target ref="id23"/>
-			<nail x="-136" y="-34"/>
-		</transition>
-		<transition>
-			<source ref="id25"/>
-			<target ref="id30"/>
-			<label kind="synchronisation" x="51" y="85">SendDataToGateway[id]!</label>
-			<label kind="assignment" x="-68" y="85">workerClock = 0,
-errorLED = false</label>
-			<nail x="238" y="85"/>
-		</transition>
-		<transition>
-			<source ref="id29"/>
-			<target ref="id23"/>
-			<label kind="assignment" x="-75" y="34">workerClock = 0</label>
-			<nail x="-93" y="34"/>
-		</transition>
-		<transition>
-			<source ref="id25"/>
-			<target ref="id29"/>
-			<label kind="guard" x="204" y="51">failCounter &gt;= 3 and
-sendDelay &gt;= 5</label>
-			<label kind="assignment" x="306" y="68">errorLED = true</label>
-		</transition>
-		<transition>
-			<source ref="id27"/>
-			<target ref="id25"/>
-			<label kind="assignment" x="331" y="263">sendDelay = 0</label>
-			<nail x="340" y="322"/>
-		</transition>
-		<transition>
-			<source ref="id26"/>
-			<target ref="id27"/>
-			<label kind="synchronisation" x="43" y="237">UpdateWorker[id]?</label>
-			<label kind="assignment" x="42" y="263">updateClock = 0</label>
-		</transition>
-		<transition>
-			<source ref="id28"/>
-			<target ref="id25"/>
-			<label kind="assignment" x="255" y="212">sendDelay = 0</label>
-		</transition>
-		<transition>
-			<source ref="id26"/>
-			<target ref="id28"/>
-			<label kind="guard" x="153" y="204">sendDelay &gt;= 10</label>
-		</transition>
-		<transition>
-			<source ref="id25"/>
-			<target ref="id26"/>
-			<label kind="guard" x="187" y="119">failCounter &lt; 3 and
-sendDelay &gt;= 5</label>
-			<label kind="assignment" x="195" y="153">failCounter++</label>
-		</transition>
-		<transition>
-			<source ref="id24"/>
-			<target ref="id25"/>
-			<label kind="assignment" x="178" y="-102">sendDelay = 0,
-failCounter = 0</label>
-			<nail x="340" y="-59"/>
-		</transition>
-		<transition>
-			<source ref="id23"/>
-			<target ref="id24"/>
-			<label kind="guard" x="-51" y="-85">workerClock &gt;= 300</label>
 		</transition>
 	</template>
 	<template>
 		<name>MoistureSimulater</name>
 		<declaration>clock moistClock;</declaration>
-		<location id="id32" x="-119" y="-34">
-			<label kind="invariant" x="-170" y="-8">moistClock &lt;= 600</label>
+		<location id="id28" x="-119" y="-34">
+			<label kind="invariant" x="-170" y="-8">moistClock &lt;= 2000</label>
 		</location>
-		<init ref="id32"/>
+		<init ref="id28"/>
 		<transition>
-			<source ref="id32"/>
-			<target ref="id32"/>
+			<source ref="id28"/>
+			<target ref="id28"/>
 			<label kind="guard" x="-272" y="-68">moistClock &gt;= 600</label>
 			<label kind="assignment" x="-68" y="-68">moisture -= 10,
 moistClock = 0</label>
@@ -509,38 +435,38 @@ moistClock = 0</label>
 	<template>
 		<name>Pump</name>
 		<declaration>clock pumpTimer;</declaration>
-		<location id="id33" x="-76" y="-51">
+		<location id="id29" x="-76" y="-51">
 			<name x="-86" y="-85">Off</name>
 		</location>
-		<location id="id34" x="59" y="-51">
+		<location id="id30" x="59" y="-51">
 			<name x="51" y="-93">On</name>
 		</location>
-		<init ref="id33"/>
+		<init ref="id29"/>
 		<transition>
-			<source ref="id34"/>
-			<target ref="id34"/>
+			<source ref="id30"/>
+			<target ref="id30"/>
 			<label kind="synchronisation" x="85" y="-68">TurnOnPump?</label>
-			<label kind="assignment" x="136" y="-76">moisture += 20</label>
+			<label kind="assignment" x="144" y="-93">moisture += 20</label>
 			<nail x="127" y="-93"/>
 			<nail x="127" y="-8"/>
 		</transition>
 		<transition>
-			<source ref="id33"/>
-			<target ref="id33"/>
+			<source ref="id29"/>
+			<target ref="id29"/>
 			<label kind="synchronisation" x="-204" y="-68">TurnOffPump?</label>
 			<nail x="-170" y="-93"/>
 			<nail x="-170" y="1"/>
 		</transition>
 		<transition>
-			<source ref="id34"/>
-			<target ref="id33"/>
+			<source ref="id30"/>
+			<target ref="id29"/>
 			<label kind="synchronisation" x="-51" y="-25">TurnOffPump?</label>
 			<label kind="assignment" x="-59" y="-8">isPumpOn = false</label>
 			<nail x="0" y="-25"/>
 		</transition>
 		<transition>
-			<source ref="id33"/>
-			<target ref="id34"/>
+			<source ref="id29"/>
+			<target ref="id30"/>
 			<label kind="synchronisation" x="-51" y="-102">TurnOnPump?</label>
 			<label kind="assignment" x="-51" y="-144">moisture += 20,
 isPumpOn = true</label>
@@ -548,7 +474,7 @@ isPumpOn = true</label>
 		</transition>
 	</template>
 	<system>// List one or more processes to be composed into a system.
-system UserInputSimulation,Gateway,ActuatorWorker, Pump, MoistureSimulater, SensorWorker;
+system UserInputSimulation,Gateway,ActuatorWorker, Pump, MoistureSimulater,Go,PumpBL;
 </system>
 	<queries>
 		<query>
@@ -569,10 +495,6 @@ Must be able to check if environment requirements for a plant are not met</comme
 			<comment>.</comment>
 		</query>
 		<query>
-			<formula>E&lt;&gt; SensorWorker(0).SampleSensors</formula>
-			<comment></comment>
-		</query>
-		<query>
 			<formula></formula>
 			<comment></comment>
 		</query>
@@ -583,11 +505,7 @@ When a worker detects a non-optimal environment, it should act to make the envir
 i.e., if soil moisture threshold is not met, the pump should water the plant to a certain soil moisture threshold.</comment>
 		</query>
 		<query>
-			<formula>A[] ActuatorWorker.LowSoilMoistureDetected implies Pump.On</formula>
-			<comment></comment>
-		</query>
-		<query>
-			<formula>A[] ActuatorWorker.GoodSoilMoistureDetected implies Pump.Off</formula>
+			<formula>A[] ActuatorWorker.LowSoilMoistureDetected imply Pump.On</formula>
 			<comment></comment>
 		</query>
 		<query>
@@ -604,7 +522,7 @@ A worker must report sensor values to the gateway within a user-defined time or 
 			<comment></comment>
 		</query>
 		<query>
-			<formula>inf{ActuatorWorker.TryToSendData} : ActuatorWorker.workerClock</formula>
+			<formula>inf{ActuatorWorker.TryToSendData} : ActuatorWorker.workerClock	</formula>
 			<comment></comment>
 		</query>
 		<query>
@@ -615,10 +533,6 @@ A worker must report sensor values to the gateway within a user-defined time or 
 			<formula>FR08</formula>
 			<comment>FR08:
 The workers must send data to the gateway</comment>
-		</query>
-		<query>
-			<formula>E&lt;&gt; SensorWorker(0).Worked</formula>
-			<comment></comment>
 		</query>
 		<query>
 			<formula>E&lt;&gt; ActuatorWorker.Worked</formula>
@@ -652,8 +566,7 @@ We don't model MQTT so this should just be able to reach 'worked'.</comment>
 A user should be able to push updates to the workers though the gateway “using  MQTT”.</comment>
 		</query>
 		<query>
-			<formula>UserInputSimulation.UpdateVariable --&gt; SensorWorker(0).Update or SensorWorker(0).AltUpdate
-	or ActuatorWorker.Update or ActuatorWorker.AltUpdate</formula>
+			<formula>UserInputSimulation.UpdateVariable --&gt; ActuatorWorker.Update or ActuatorWorker.AltUpdate</formula>
 			<comment></comment>
 		</query>
 		<query>
@@ -666,15 +579,11 @@ A user should be able to push updates to the workers though the gateway “using
 When an environment variable becomes non-optimal, the actuator worker should fix it in the time it is allowed to sleep or less.</comment>
 		</query>
 		<query>
-			<formula>A[] (naturalLight &lt; 6 and !DayNightCycle.Night) and FR13Clock &gt;= 500 implies LED.ON</formula>
+			<formula>sup{PumpBL.MoistureIsLow and Pump.On} : PumpBLP</formula>
 			<comment></comment>
 		</query>
 		<query>
-			<formula>A[] (naturalLight &lt; 6 and !DayNightCycle.Night) and FR13Clock &gt;= 600 implies LED.ON</formula>
-			<comment></comment>
-		</query>
-		<query>
-			<formula></formula>
+			<formula>A[] PumpBL.MoistureIsLow and PumpBLP &gt;= 311 imply Pump.On</formula>
 			<comment></comment>
 		</query>
 		<query>
